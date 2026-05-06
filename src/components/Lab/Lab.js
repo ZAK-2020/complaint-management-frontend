@@ -454,6 +454,8 @@ const Lab = ({ openRemarksModal }) => {
         return "status-observation";
       case "out of stock":
         return "status-out-of-stock";
+      case "not repairable":
+        return "status-not-repairable";
       case "pre approved":
         return "status-pre-approved";
 

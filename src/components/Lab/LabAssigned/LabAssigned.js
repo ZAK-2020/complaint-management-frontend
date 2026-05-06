@@ -68,6 +68,10 @@ const getStatusClass = (status) => {
       return "status-delivered";
     case "observation":
       return "status-observation";
+    case "out of stock":
+      return "status-out-of-stock";
+    case "not repairable":
+      return "status-not-repairable";
     default:
       return "status-default";
   }

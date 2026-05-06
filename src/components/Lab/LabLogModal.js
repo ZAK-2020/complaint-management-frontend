@@ -115,6 +115,12 @@ const LabLogModal = ({
       setReceivedInwardDate("");
       setDispatchOutwardDate("");
       setHOkDate("");
+    } else if (value === "Not Repairable") {
+      setCourierStatus(value);
+      setReceivedInwardDate("");
+      setDispatchOutwardDate("");
+      setHOkDate("");
+      setOutOfStockDate("");
     }else {
       setCourierStatus(value);
       setReceivedInwardDate("");
@@ -213,6 +219,7 @@ const LabLogModal = ({
               <option value="Dispatch Outward">Dispatch Outward</option>
               <option value="Observation">Observation</option>
               <option value="Out Of Stock">Out Of Stock</option>
+              <option value="Not Repairable">Not Repairable</option>
             </select>
           </div>
 

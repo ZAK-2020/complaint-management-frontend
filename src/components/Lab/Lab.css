@@ -74,6 +74,15 @@
   font-weight: bold;
   text-align: center;
 }
+
+.status-not-repairable {
+  background-color: #b91c1c;
+  color: #ffffff !important;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+}
 /* Table styling */
 .complaint-table {
     width: 100%;
