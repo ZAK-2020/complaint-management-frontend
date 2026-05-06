@@ -345,7 +345,19 @@ const LabAssigned = ({ openRemarksModal }) => {
           `${API_BASE_URL}/hardware-logs/parts-assigned/${currentUsername}`,
           { withCredentials: true }
         );
-        setHardwareLogsParts(Array.isArray(response.data) ? response.data : []);
+        const logs = Array.isArray(response.data) ? response.data : [];
+        setHardwareLogsParts(logs);
+        setHardwarePartsByLog((prev) => {
+          const next = { ...prev };
+          logs.forEach((log) => {
+            const partKey = log.complaintLog?.id;
+            const parts = log.complaintLog?.hardwareParts;
+            if (partKey && Array.isArray(parts)) {
+              next[partKey] = parts;
+            }
+          });
+          return next;
+        });
       } catch (error) {
         setHardwareLogsParts([]);
       } finally {
@@ -389,17 +401,6 @@ const LabAssigned = ({ openRemarksModal }) => {
     },
     [API_BASE_URL]
   );
-
-  useEffect(() => {
-    if (viewMode !== "parts") return;
-
-    hardwareLogsParts.forEach((log) => {
-      const partKey = log.complaintLog?.id;
-      if (partKey && hardwarePartsByLog[partKey] === undefined) {
-        fetchPartsForLog(partKey);
-      }
-    });
-  }, [hardwareLogsParts, hardwarePartsByLog, fetchPartsForLog, viewMode]);
 
   // -------------------- Report availability ------------------------
   useEffect(() => {
@@ -693,6 +694,17 @@ const LabAssigned = ({ openRemarksModal }) => {
     const startIndex = (partsCurrentPage - 1) * recordsPerPage;
     return filteredLogsParts.slice(startIndex, startIndex + recordsPerPage);
   }, [filteredLogsParts, partsCurrentPage]);
+
+  useEffect(() => {
+    if (viewMode !== "parts") return;
+
+    partsCurrentRecords.forEach((log) => {
+      const partKey = log.complaintLog?.id;
+      if (partKey && hardwarePartsByLog[partKey] === undefined) {
+        fetchPartsForLog(partKey);
+      }
+    });
+  }, [partsCurrentRecords, hardwarePartsByLog, fetchPartsForLog, viewMode]);
 
   const getVisiblePages = (totalPages, currPage) => {
     const pages = [];
