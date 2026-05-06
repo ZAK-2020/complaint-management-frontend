@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./RemarksModal.css";
 import ComplaintReport from "../../ComplaintReport/ComplaintReport";
+import { formatKarachiDateTimeParts } from "../../../utils/dateTime";
 
 const RemarksModal = ({
   isOpen,
@@ -97,14 +98,17 @@ const RemarksModal = ({
             </button>
             {latestRemarks && (
               <div className="remarks-display">
-                <div className="timestamp">
-                  <span className="date">
-                    {latestRemarks.timestamp.split("T")[0]}
-                  </span>
-                  <span className="time">
-                    {latestRemarks.timestamp.split("T")[1]}
-                  </span>
-                </div>
+                {(() => {
+                  const { date, time } = formatKarachiDateTimeParts(
+                    latestRemarks.timestamp
+                  );
+                  return (
+                    <div className="timestamp">
+                      <span className="date">{date}</span>
+                      <span className="time">{time}</span>
+                    </div>
+                  );
+                })()}
                 <span className="remark-text">{latestRemarks.remarks}</span>
               </div>
             )}
@@ -119,7 +123,9 @@ const RemarksModal = ({
               <div className="remarks-history">
                 <ul>
                   {remarksHistory.map((entry) => {
-                    const [date, time] = entry.timestamp.split("T");
+                    const { date, time } = formatKarachiDateTimeParts(
+                      entry.timestamp
+                    );
                     return (
                       <li key={entry.id}>
                         <div className="timestamp">

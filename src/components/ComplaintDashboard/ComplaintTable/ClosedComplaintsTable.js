@@ -41,7 +41,6 @@ const ClosedComplaintsTable = ({
   const [cityList, setCityList] = useState([]);
   const [statusList, setStatusList] = useState([]);
   const [engineers, setEngineers] = useState([]);
-  const [progress, setProgress] = useState(0);
 
   // NEW: backend-provided serial offset (complaints before this page)
   const [complaintsBeforePage, setComplaintsBeforePage] = useState(0);
@@ -59,8 +58,8 @@ const ClosedComplaintsTable = ({
   const uniqueEngineers = Array.from(new Set(allComplaints.map((c) => c.engineerName).filter(Boolean)));
   const uniqueCities = Array.from(new Set(allComplaints.map((c) => c.city).filter(Boolean)));
   const uniqueSubStatuses = Array.from(new Set(allComplaints.map((c) => c.subStatus).filter(Boolean)));
-  const EXPORT_PAGE_SIZE = 1000; // try 1000–2000
-  const EXPORT_BATCH_SIZE = 3;   // 6–12 is usually safe
+  const EXPORT_PAGE_SIZE = 250; // keep export chunks bounded for server memory
+  const EXPORT_BATCH_SIZE = 2;   // smaller batches reduce parallel backend pressure
   
   // ---- helpers
   const pick = (obj, keys) =>
@@ -93,12 +92,6 @@ const ClosedComplaintsTable = ({
   // --- Fetch complaints, returns groups from API ---
   const fetchComplaints = async () => {
     setLoading(true);
-    setProgress(0);
-
-    // simulate progress increase until 90%
-    let interval = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-    }, 300);
 
     try {
       const shared = pick(globalFilters, CLOSED_ALLOWED_KEYS);
@@ -125,17 +118,13 @@ const ClosedComplaintsTable = ({
         res.headers?.["x-complaints-before-page"] ?? res.headers?.["X-Complaints-Before-Page"];
       setComplaintsBeforePage(Number.parseInt(beforePageHeader, 10) || 0);
 
-      // complete progress
-      setProgress(100);
     } catch (err) {
       setBranchGroups([]);
       setTotalPages(1);
       setTotalRecords(0);
       setComplaintsBeforePage(0); // reset offset on error
-      setProgress(100); // still finish the progress bar on error
     } finally {
-      clearInterval(interval);
-      setTimeout(() => setLoading(false), 500); // short delay to show 100%
+      setLoading(false);
     }
   };
 
@@ -461,7 +450,7 @@ const ClosedComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader progress={progress} />
+                <Loader label="Loading complaints..." />
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIndex) => (
                   <React.Fragment key={group.bankName + group.branchCode + groupIndex}>

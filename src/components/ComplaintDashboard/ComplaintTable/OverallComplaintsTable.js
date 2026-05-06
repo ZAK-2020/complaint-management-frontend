@@ -42,8 +42,6 @@ const OverallComplaintsTable = ({
   const [cityList, setCityList] = useState([]);
   const [statusList, setStatusList] = useState([]);
   const [engineers, setEngineers] = useState([]);
-  const [progress, setProgress] = useState(0);
-
   // NEW: backend-provided serial offset (complaints before this page)
   const [complaintsBeforePage, setComplaintsBeforePage] = useState(0);
 
@@ -64,12 +62,6 @@ const OverallComplaintsTable = ({
   // --- Fetch complaints (UPDATED to read header X-Complaints-Before-Page)
   const fetchComplaints = async () => {
     setLoading(true);
-    setProgress(0);
-
-    // simulate progress increment
-    let interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + 10 : p)); // up to 90%
-    }, 300);
 
     try {
       const { reportType, ...filtersForApi } = globalFilters;
@@ -96,9 +88,7 @@ const OverallComplaintsTable = ({
       setTotalRecords(0);
       setComplaintsBeforePage(0);
     } finally {
-      clearInterval(interval);
-      setProgress(100); // complete
-      setTimeout(() => setLoading(false), 500); // small delay for smoothness
+      setLoading(false);
     }
   };
 
@@ -235,8 +225,8 @@ const OverallComplaintsTable = ({
   };
 
   // --- Export helpers
-  const EXPORT_PAGE_SIZE = 2000; // larger chunk for export
-  const EXPORT_BATCH_SIZE = 3; // safe parallel batch size
+  const EXPORT_PAGE_SIZE = 250; // keep export chunks bounded for server memory
+  const EXPORT_BATCH_SIZE = 2; // smaller batches reduce parallel backend pressure
 
   const fetchAllComplaintsForExport = async () => {
     const { reportType, ...filtersForApi } = globalFilters;
@@ -432,7 +422,7 @@ const OverallComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader progress={progress} />
+                <Loader label="Loading complaints..." />
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIndex) => (
                   <React.Fragment key={groupIndex}>

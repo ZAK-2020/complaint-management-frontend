@@ -34,7 +34,6 @@ const OutgoingHardwareLogList = ({ openRemarksModal, statuses }) => {
   const [courierStatusOptions, setCourierStatusOptions] = useState([]);
   // Loader state
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   // Manage Parts state
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [selectedHardwareLogId, setSelectedHardwareLogId] = useState(null);
@@ -101,12 +100,6 @@ const OutgoingHardwareLogList = ({ openRemarksModal, statuses }) => {
   // Always send courierStatus param
   const fetchHardwareLogs = useCallback(async () => {
     setLoading(true);
-    setProgress(0);
-
-    // simulate progress until axios finishes
-    let interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + 10 : p));
-    }, 300);
 
     try {
       const params = {
@@ -143,9 +136,7 @@ const OutgoingHardwareLogList = ({ openRemarksModal, statuses }) => {
       setHardwareLogs([]);
       setTotalPages(1);
     } finally {
-      clearInterval(interval);
-      setProgress(100);
-      setTimeout(() => setLoading(false), 500);
+      setLoading(false);
     }
   }, [API_BASE_URL, currentPage, appliedFilters]);
 
@@ -747,7 +738,7 @@ const OutgoingHardwareLogList = ({ openRemarksModal, statuses }) => {
             {loading ? (
               <tr>
                 <td colSpan="18" style={{ textAlign: "center" }}>
-                  <Loader progress={progress} />
+                  <Loader label="Loading hardware logs..." />
                 </td>
               </tr>
             ) : hardwareLogs.length > 0 ? (
@@ -808,7 +799,7 @@ const OutgoingHardwareLogList = ({ openRemarksModal, statuses }) => {
                           Manage Parts
                         </button>
                         {hardwarePartsByLog[partKey] === undefined ? (
-                          <Loader progress={progress} size="small" />
+                          <Loader variant="inline" size="small" label={null} />
                         ) : (
                           <span
                             style={{
@@ -844,7 +835,7 @@ const OutgoingHardwareLogList = ({ openRemarksModal, statuses }) => {
                           }
                         >
                           {remarksCounts[log.complaintLog?.id] === undefined ? (
-                            <Loader progress={progress} size="tiny" />
+                            <Loader variant="inline" size="tiny" label={null} />
                           ) : (
                             "Remarks"
                           )}

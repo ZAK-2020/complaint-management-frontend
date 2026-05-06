@@ -1,13 +1,23 @@
 import React from "react";
 import "./Loader.css";
 
-const Loader = ({ progress }) => {
+const Loader = ({
+  variant = "section",
+  size = "medium",
+  label = "Loading...",
+  progress,
+}) => {
+  const resolvedLabel =
+    progress !== undefined ? `${progress}%` : label;
+
   return (
-    <div className="loader-overlay">
-      <div className="spinner"></div>
-      {progress !== undefined && (
-        <div className="progress-text">{progress}%</div>
-      )}
+    <div className={`loader loader--${variant}`}>
+      <div className={`loader-spinner loader-spinner--${size}`}></div>
+      {resolvedLabel ? (
+        <div className={`loader-text loader-text--${variant}`}>
+          {resolvedLabel}
+        </div>
+      ) : null}
     </div>
   );
 };

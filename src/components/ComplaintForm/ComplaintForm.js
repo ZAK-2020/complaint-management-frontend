@@ -4,9 +4,46 @@ import CreatableSelect from "react-select/creatable";
 import "react-datepicker/dist/react-datepicker.css";
 import "./complaintForm.css";
 
+const MASTER_DATA_CACHE_KEY = "complaint-form-master-data-v1";
+const MASTER_DATA_CACHE_TTL_MS = 15 * 60 * 1000;
+
+const getTodayInputValue = () => {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().split("T")[0];
+};
+
+const readMasterDataCache = () => {
+  try {
+    const raw = sessionStorage.getItem(MASTER_DATA_CACHE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed?.timestamp || Date.now() - parsed.timestamp > MASTER_DATA_CACHE_TTL_MS) {
+      sessionStorage.removeItem(MASTER_DATA_CACHE_KEY);
+      return null;
+    }
+
+    return parsed.data || null;
+  } catch {
+    return null;
+  }
+};
+
+const writeMasterDataCache = (data) => {
+  try {
+    sessionStorage.setItem(
+      MASTER_DATA_CACHE_KEY,
+      JSON.stringify({ timestamp: Date.now(), data })
+    );
+  } catch {
+    // Ignore cache failures and continue with live data.
+  }
+};
+
 const ComplaintForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split("T")[0],
+    date: getTodayInputValue(),
     bankName: "",
     branchCode: "",
     branchName: "",
@@ -26,9 +63,11 @@ const ComplaintForm = ({ onSubmit }) => {
   const [complaintTypes, setComplaintTypes] = useState([]);
   const [branches, setBranches] = useState([]);
   const [branchCache, setBranchCache] = useState({});
+  const [visitorCache, setVisitorCache] = useState({});
   const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [branchesLoading, setBranchesLoading] = useState(false);
+  const [visitorsLoading, setVisitorsLoading] = useState(false);
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -45,23 +84,33 @@ const ComplaintForm = ({ onSubmit }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [banksRes, visitorsRes, typesRes, citiesRes] = await Promise.all([
+        const cachedData = readMasterDataCache();
+
+        if (cachedData) {
+          setBanks(Array.isArray(cachedData.banks) ? cachedData.banks : []);
+          setComplaintTypes(Array.isArray(cachedData.complaintTypes) ? cachedData.complaintTypes : []);
+          setCities(Array.isArray(cachedData.cities) ? cachedData.cities : []);
+        }
+
+        const [banksRes, typesRes, citiesRes] = await Promise.all([
           axios.get(`${API_BASE_URL}/data/banks`, { withCredentials: true }),
-          axios.get(`${API_BASE_URL}/data/visitors`, { withCredentials: true }),
           axios.get(`${API_BASE_URL}/data/complaint-types`, { withCredentials: true }),
           axios.get(`${API_BASE_URL}/data/cities`, { withCredentials: true }),
         ]);
 
         const banksData = Array.isArray(banksRes.data) ? banksRes.data : [];
-        const visitorsData = Array.isArray(visitorsRes.data) ? visitorsRes.data : [];
         const typesData = Array.isArray(typesRes.data) ? typesRes.data : [];
         const citiesData = Array.isArray(citiesRes.data) ? citiesRes.data : [];
 
         setBanks(banksData);
-        setVisitors(visitorsData);
-        setFilteredVisitors(visitorsData);
         setComplaintTypes(typesData);
         setCities(citiesData);
+
+        writeMasterDataCache({
+          banks: banksData,
+          complaintTypes: typesData,
+          cities: citiesData,
+        });
       } catch (error) {
         console.error("Error fetching initial form data:", error);
       }
@@ -69,6 +118,65 @@ const ComplaintForm = ({ onSubmit }) => {
 
     fetchInitialData();
   }, [API_BASE_URL]);
+
+  const fetchVisitorsByCity = async (city, { force = false } = {}) => {
+    const normalizedCity = city?.trim();
+    if (!normalizedCity) {
+      setVisitors([]);
+      setFilteredVisitors([]);
+      return;
+    }
+
+    const cacheKey = normalizedCity.toLowerCase();
+    if (!force && visitorCache[cacheKey]) {
+      const cachedVisitors = visitorCache[cacheKey];
+      setVisitors(cachedVisitors);
+      setFilteredVisitors(cachedVisitors);
+      return;
+    }
+
+    setVisitorsLoading(true);
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/data/visitors`, {
+        params: { city: normalizedCity },
+        withCredentials: true,
+      });
+
+      const visitorsData = Array.isArray(response.data) ? response.data : [];
+      setVisitorCache((prev) => ({
+        ...prev,
+        [cacheKey]: visitorsData,
+      }));
+      setVisitors(visitorsData);
+      setFilteredVisitors(visitorsData);
+      setFormData((prev) => {
+        const selectedVisitorStillExists = visitorsData.some(
+          (visitor) => visitor.name === prev.visitorName
+        );
+
+        return selectedVisitorStillExists
+          ? prev
+          : { ...prev, visitorName: "", visitorId: null };
+      });
+    } catch (error) {
+      console.error("Error fetching visitors:", error);
+      setVisitors([]);
+      setFilteredVisitors([]);
+    } finally {
+      setVisitorsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!formData.city) {
+      setVisitors([]);
+      setFilteredVisitors([]);
+      return;
+    }
+
+    fetchVisitorsByCity(formData.city);
+  }, [API_BASE_URL, formData.city]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchBranches = async (bankName) => {
     if (!bankName) {
@@ -179,18 +287,20 @@ const ComplaintForm = ({ onSubmit }) => {
       return;
     }
 
-    setFormData((prev) => {
+      setFormData((prev) => {
       const selectedBranch = branches.find(
         (branch) =>
           branch.branchCode === branchCode && branch.bank === prev.bankName
       );
 
       const formattedBranchCode = branchCode.padStart(4, "0");
+      const nextCity = selectedBranch?.city || prev.city;
 
       return {
         ...prev,
         branchCode: formattedBranchCode,
         branchName: selectedBranch ? selectedBranch.branchName : prev.branchName,
+        city: nextCity,
       };
     });
 
@@ -236,12 +346,8 @@ const ComplaintForm = ({ onSubmit }) => {
       }
 
       if (name === "city") {
-        const filtered = visitors.filter(
-          (visitor) =>
-            visitor.city &&
-            visitor.city.trim().toLowerCase() === value.trim().toLowerCase()
-        );
-        setFilteredVisitors(filtered.length > 0 ? filtered : visitors);
+        updatedFormData.visitorName = "";
+        updatedFormData.visitorId = null;
       }
 
       return updatedFormData;
@@ -298,7 +404,7 @@ const ComplaintForm = ({ onSubmit }) => {
       }
 
       setFormData({
-        date: new Date().toISOString().split("T")[0],
+        date: getTodayInputValue(),
         bankName: "",
         branchCode: "",
         branchName: "",
@@ -312,7 +418,8 @@ const ComplaintForm = ({ onSubmit }) => {
       });
 
       setBranches([]);
-      setFilteredVisitors(visitors);
+      setVisitors([]);
+      setFilteredVisitors([]);
     } catch (error) {
       console.error("Error logging complaint:", error);
       alert("An error occurred while submitting the complaint. Please try again.");
@@ -463,8 +570,15 @@ const ComplaintForm = ({ onSubmit }) => {
               name="visitorName"
               value={formData.visitorName}
               onChange={handleChange}
+              disabled={!formData.city || visitorsLoading}
             >
-              <option value="">Select Visitor</option>
+              <option value="">
+                {!formData.city
+                  ? "Select city first"
+                  : visitorsLoading
+                    ? "Loading visitors..."
+                    : "Select Visitor"}
+              </option>
               {filteredVisitors.map((visitor) => (
                 <option key={visitor.id} value={visitor.name}>
                   {visitor.name} - {visitor.city || "No City"}

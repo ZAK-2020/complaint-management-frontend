@@ -69,6 +69,9 @@
   text-decoration: none;
   color: #555;
   font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
   border-radius: 10px;
   text-align: left;
@@ -91,6 +94,10 @@
 .sidebar-nav .nav-item .icon {
   margin-right: 10px;
   font-size: 18px;
+  min-width: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Main Content Styles */

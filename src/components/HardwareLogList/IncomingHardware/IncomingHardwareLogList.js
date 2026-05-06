@@ -35,7 +35,6 @@ const IncomingHardwareLogList = ({ openRemarksModal, statuses }) => {
   const [selectedHardwareLogId, setSelectedHardwareLogId] = useState(null);
   const [hardwarePartsByLog, setHardwarePartsByLog] = useState({});
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   // Tooltip management
   const [tooltipData, setTooltipData] = useState({
@@ -99,11 +98,6 @@ const IncomingHardwareLogList = ({ openRemarksModal, statuses }) => {
   // Fetch paginated hardware logs from backend
   const fetchHardwareLogs = useCallback(async () => {
     setLoading(true);
-    setProgress(0);
-
-    let interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + 10 : p));
-    }, 300);
 
     try {
       const params = {
@@ -127,15 +121,12 @@ const IncomingHardwareLogList = ({ openRemarksModal, statuses }) => {
 
       setHardwareLogs(response.data.content || []);
       setTotalPages(response.data.totalPages || 1);
-      setProgress(100);
     } catch (error) {
       console.error("Error fetching hardware logs:", error);
       setHardwareLogs([]);
       setTotalPages(1);
-      setProgress(100);
     } finally {
-      clearInterval(interval);
-      setTimeout(() => setLoading(false), 500);
+      setLoading(false);
     }
   }, [API_BASE_URL, currentPage, appliedFilters]);
 
@@ -681,7 +672,7 @@ const IncomingHardwareLogList = ({ openRemarksModal, statuses }) => {
             {loading ? (
               <tr>
                 <td colSpan="17" style={{ textAlign: "center" }}>
-                  <Loader progress={progress} />
+                  <Loader label="Loading hardware logs..." />
                 </td>
               </tr>
             ) : hardwareLogs.length > 0 ? (

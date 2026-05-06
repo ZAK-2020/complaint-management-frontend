@@ -42,8 +42,6 @@ const WaitForApprovalComplaintsTable = ({
   const [cityList, setCityList] = useState([]);
   const [statusList, setStatusList] = useState([]);
   const [engineers, setEngineers] = useState([]);
-  const [progress, setProgress] = useState(0);
-
   // NEW: backend-provided continuous serial offset for this page
   const [complaintsBeforePage, setComplaintsBeforePage] = useState(0);
 
@@ -99,12 +97,6 @@ const WaitForApprovalComplaintsTable = ({
   // --- Fetch complaints, returns groups from API ---
   const fetchComplaints = async () => {
     setLoading(true);
-    setProgress(0); // reset loader percentage
-
-    // simulate progress increase until ~90%
-    let interval = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-    }, 300);
 
     try {
       const shared = pick(globalFilters, WFA_ALLOWED_KEYS);
@@ -142,16 +134,13 @@ const WaitForApprovalComplaintsTable = ({
         res.headers?.["X-Complaints-Before-Page"];
       setComplaintsBeforePage(Number.parseInt(beforePageHeader, 10) || 0);
 
-      setProgress(100); // complete loader
     } catch (err) {
       setBranchGroups([]);
       setTotalPages(1);
       setTotalRecords(0);
       setComplaintsBeforePage(0); // reset on error
-      setProgress(100); // still finish at 100% if error
     } finally {
-      clearInterval(interval);
-      setTimeout(() => setLoading(false), 500); // delay so user sees 100%
+      setLoading(false);
     }
   };
 
@@ -300,8 +289,8 @@ const WaitForApprovalComplaintsTable = ({
     setFilters(defaultFilters);
   };
 
-  const EXPORT_PAGE_SIZE = 1000; // use larger chunk size for exports
-  const EXPORT_BATCH_SIZE = 3;   // number of pages to fetch concurrently
+  const EXPORT_PAGE_SIZE = 250; // keep export chunks bounded for server memory
+  const EXPORT_BATCH_SIZE = 2;   // smaller batches reduce parallel backend pressure
   
   const fetchAllComplaintsForExport = async () => {
     const shared = pick(globalFilters, WFA_ALLOWED_KEYS);
@@ -504,7 +493,7 @@ const WaitForApprovalComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader progress={progress} />
+                <Loader label="Loading complaints..." />
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIdx) => (
                   <React.Fragment

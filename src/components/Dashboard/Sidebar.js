@@ -1,5 +1,27 @@
 import React, { useState } from "react";
+import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
+import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
+import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
+import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
+import SouthWestRoundedIcon from "@mui/icons-material/SouthWestRounded";
+import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
+import ScienceRoundedIcon from "@mui/icons-material/ScienceRounded";
+import EngineeringRoundedIcon from "@mui/icons-material/EngineeringRounded";
+import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
+import TodayRoundedIcon from "@mui/icons-material/TodayRounded";
+import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import Logo from "../../assets/logo.gif";
+
+const NavButton = ({ icon, label, onClick, className = "nav-item" }) => (
+  <button className={className} onClick={onClick} type="button">
+    <span className="icon" aria-hidden="true">
+      {icon}
+    </span>
+    <span>{label}</span>
+  </button>
+);
 
 const Sidebar = ({ handleNavigation }) => {
   const [isCourierTrackingOpen, setIsCourierTrackingOpen] = useState(false);
@@ -8,163 +30,121 @@ const Sidebar = ({ handleNavigation }) => {
 
   const username = localStorage.getItem("username") || "User";
   const userType = localStorage.getItem("userType");
-  // console.log("Sidebar userType is:", userType);
-  const toggleCourierTracking = () => {
-    setIsCourierTrackingOpen(!isCourierTrackingOpen);
-  };
 
-  const toggleMetricsDropdown = () => {
-    setIsMetricsDropdownOpen(!isMetricsDropdownOpen);
-  };
-
-  const toggleLabDropdown = () => {
-    setIsLabDropdownOpen(!isLabDropdownOpen);
-  };
   const handleLogout = async () => {
-    // 1. Tell the backend to log out (invalidates session cookie)
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/logout`, {
       method: "POST",
       credentials: "include",
     });
-  
-    // 2. Clear any local storage
+
     localStorage.clear();
-  
-    // 3. Redirect to login
     window.location.href = "/login";
   };
-  
-  const renderSidebarItems = () => {
-      if (userType === "LAB_USER" && username !== "qamar") {
-        return (
-          <>
-            <button className="nav-item" onClick={toggleLabDropdown}>
-              <span className="icon">🔬</span> Lab
-            </button>
-            {isLabDropdownOpen && (
-              <div className="submenu">
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("lab")}
-                >
-                  <span className="icon">🔬</span> Lab Dashboard
-                </button>
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("lab-assigned")}
-                >
-                  <span className="icon">👨‍🔬</span> Lab Assigned
-                </button>
-              </div>
-            )}
-          </>
-        );
-      }
-      else if(userType === "OFFICE_USER" && username === "abdullah"){
-        <button
-      className="nav-item"
-      onClick={() => handleNavigation("isb-rwp-complaints")}
-    >
-      <span className="icon">🏢</span> ISB/RWP Complaints
-    </button>
-      }
-      else{
-        return (
-          <>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigation("dashboard")}
-            >
-              <span className="icon">🏠</span> Dashboard
-            </button>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigation("new-complaint")}
-            >
-              <span className="icon">➕</span> Register New Complaint
-            </button>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigation("scheduler")}
-            >
-              <span className="icon">📅</span> Scheduler
-            </button>
-            <button className="nav-item" onClick={toggleCourierTracking}>
-              <span className="icon">🖥️</span> Courier Tracking
-            </button>
-            {isCourierTrackingOpen && (
-              <div className="submenu">
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("incoming-hardware")}
-                >
-                  <span className="icon">⬅️</span> Incoming Hardware
-                </button>
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("outgoing-hardware")}
-                >
-                  <span className="icon">➡️</span> Outgoing Hardware
-                </button>
-              </div>
-            )}
-            <button
-              className="nav-item submenu-item"
-              onClick={() => handleNavigation("lab")}
-            >
-              <span className="icon">🔬</span> Lab
-            </button>
-            {isLabDropdownOpen && (
-              <div className="submenu">
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("lab")}
-                >
-                  <span className="icon">🔬</span> Lab Dashboard
-                </button>
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("lab-assigned")}
-                >
-                  <span className="icon">👨‍🔬</span> Lab Assigned
-                </button>
-              </div>
-            )}
-          
-            <button className="nav-item" onClick={toggleMetricsDropdown}>
-              <span className="icon">📊</span> Metrics
-            </button>
-            {isMetricsDropdownOpen && (
-              <div className="submenu">
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("todays-metrics")}
-                >
-                  <span className="icon">📅</span> Today's Metrics
-                </button>
-                <button
-                  className="nav-item submenu-item"
-                  onClick={() => handleNavigation("overall-metrics")}
-                >
-                  <span className="icon">📊</span> Overall Metrics
-                </button>
-              </div>
-            )}
-            <button className="nav-item" onClick={() => handleNavigation("map")}>
-              <span className="icon">🗺️</span> Map
-            </button>
-          </>
-        );
-      }
-    // For all other users, show full menu
-   
-  };
 
-  const renderLogoutButton = () => (
-    <button className="nav-item logout-button" onClick={handleLogout}>
-      <span className="icon">🚪</span> Logout
-    </button>
+  const renderLabMenu = () => (
+    <>
+      <NavButton
+        icon={<ScienceRoundedIcon fontSize="small" />}
+        label="Lab"
+        onClick={() => setIsLabDropdownOpen((prev) => !prev)}
+      />
+      {isLabDropdownOpen && (
+        <div className="submenu">
+          <NavButton
+            className="nav-item submenu-item"
+            icon={<ScienceRoundedIcon fontSize="small" />}
+            label="Lab Dashboard"
+            onClick={() => handleNavigation("lab")}
+          />
+          <NavButton
+            className="nav-item submenu-item"
+            icon={<EngineeringRoundedIcon fontSize="small" />}
+            label="Lab Assigned"
+            onClick={() => handleNavigation("lab-assigned")}
+          />
+        </div>
+      )}
+    </>
   );
+
+  const renderSidebarItems = () => {
+    if (userType === "LAB_USER" && username !== "qamar") {
+      return renderLabMenu();
+    }
+
+    if (userType === "OFFICE_USER" && username === "abdullah") {
+      return (
+        <NavButton
+          icon={<BusinessRoundedIcon fontSize="small" />}
+          label="ISB/RWP Complaints"
+          onClick={() => handleNavigation("isb-rwp-complaints")}
+        />
+      );
+    }
+
+    return (
+      <>
+        <NavButton
+          icon={<DashboardRoundedIcon fontSize="small" />}
+          label="Dashboard"
+          onClick={() => handleNavigation("dashboard")}
+        />
+        <NavButton
+          icon={<AddCircleOutlineRoundedIcon fontSize="small" />}
+          label="Register New Complaint"
+          onClick={() => handleNavigation("new-complaint")}
+        />
+        <NavButton
+          icon={<EventNoteRoundedIcon fontSize="small" />}
+          label="Scheduler"
+          onClick={() => handleNavigation("scheduler")}
+        />
+        <NavButton
+          icon={<LocalShippingRoundedIcon fontSize="small" />}
+          label="Courier Tracking"
+          onClick={() => setIsCourierTrackingOpen((prev) => !prev)}
+        />
+        {isCourierTrackingOpen && (
+          <div className="submenu">
+            <NavButton
+              className="nav-item submenu-item"
+              icon={<SouthWestRoundedIcon fontSize="small" />}
+              label="Incoming Hardware"
+              onClick={() => handleNavigation("incoming-hardware")}
+            />
+            <NavButton
+              className="nav-item submenu-item"
+              icon={<NorthEastRoundedIcon fontSize="small" />}
+              label="Outgoing Hardware"
+              onClick={() => handleNavigation("outgoing-hardware")}
+            />
+          </div>
+        )}
+        {renderLabMenu()}
+        <NavButton
+          icon={<QueryStatsRoundedIcon fontSize="small" />}
+          label="Metrics"
+          onClick={() => setIsMetricsDropdownOpen((prev) => !prev)}
+        />
+        {isMetricsDropdownOpen && (
+          <div className="submenu">
+            <NavButton
+              className="nav-item submenu-item"
+              icon={<TodayRoundedIcon fontSize="small" />}
+              label="Today's Metrics"
+              onClick={() => handleNavigation("todays-metrics")}
+            />
+            <NavButton
+              className="nav-item submenu-item"
+              icon={<AssessmentRoundedIcon fontSize="small" />}
+              label="Overall Metrics"
+              onClick={() => handleNavigation("overall-metrics")}
+            />
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <aside className="sidebar">
@@ -174,7 +154,12 @@ const Sidebar = ({ handleNavigation }) => {
       </div>
       <nav className="sidebar-nav">
         {renderSidebarItems()}
-        {renderLogoutButton()}
+        <NavButton
+          className="nav-item logout-button"
+          icon={<LogoutRoundedIcon fontSize="small" />}
+          label="Logout"
+          onClick={handleLogout}
+        />
       </nav>
     </aside>
   );

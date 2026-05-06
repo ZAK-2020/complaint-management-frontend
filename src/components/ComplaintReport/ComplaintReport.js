@@ -3,6 +3,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "./ComplaintReport.css";
+import { formatKarachiDateTime } from "../../utils/dateTime";
 
 const ComplaintReport = ({ complaintId }) => {
   const [complaintDetails, setComplaintDetails] = useState(null);
@@ -94,7 +95,7 @@ const ComplaintReport = ({ complaintId }) => {
           entry.fieldName,
           entry.oldValue || "N/A",
           entry.newValue || "N/A",
-          new Date(entry.changeDate).toLocaleString(), // Updated
+          formatKarachiDateTime(entry.changeDate),
           entry.changedBy || "N/A",
           entry.reasonForChange || "N/A",
           entry.loggedBy || "N/A",
@@ -115,7 +116,7 @@ const ComplaintReport = ({ complaintId }) => {
         head: [["Remark", "Timestamp", "Commented By"]],
         body: remarks.map((remark) => [
           remark.remarks,
-          new Date(remark.timestamp).toLocaleString(),
+          formatKarachiDateTime(remark.timestamp),
           remark.commentedBy || "N/A",
         ]),
         theme: "grid",
@@ -134,7 +135,7 @@ if (hardwareReports.length > 0) {
     body: hardwareReports.map((report) => [
       report.content,
       report.createdBy || "N/A",
-      new Date(report.createdAt).toLocaleString(),
+      formatKarachiDateTime(report.createdAt),
     ]),
     theme: "grid",
     styles: { fontSize: 10 },
@@ -209,8 +210,7 @@ if (hardwareReports.length > 0) {
                   <td>{entry.fieldName}</td>
                   <td>{entry.oldValue || "N/A"}</td>
                   <td>{entry.newValue || "N/A"}</td>
-                  <td>{new Date(entry.changeDate).toLocaleString()}</td>{" "}
-                  {/* Updated */}
+                  <td>{formatKarachiDateTime(entry.changeDate)}</td>
                   <td>{entry.changedBy || "N/A"}</td>
                   <td>{entry.reasonForChange || "N/A"}</td>
                   <td>{entry.loggedBy || "N/A"}</td>
@@ -243,7 +243,7 @@ if (hardwareReports.length > 0) {
                   className={index % 2 === 0 ? "even-row" : "odd-row"}
                 >
                   <td>{remark.remarks}</td>
-                  <td>{new Date(remark.timestamp).toLocaleString()}</td>
+                  <td>{formatKarachiDateTime(remark.timestamp)}</td>
                   <td>{remark.commentedBy || "N/A"}</td>
                 </tr>
               ))}
@@ -274,7 +274,7 @@ if (hardwareReports.length > 0) {
                 >
                   <td>{report.content}</td>
                   <td>{report.createdBy || "N/A"}</td>
-                  <td>{new Date(report.createdAt).toLocaleString()}</td>
+                  <td>{formatKarachiDateTime(report.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

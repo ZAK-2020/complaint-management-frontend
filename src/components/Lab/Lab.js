@@ -78,7 +78,6 @@ const Lab = ({ openRemarksModal }) => {
 
   // Loader state
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   // Filters
   const [filters, setFilters] = useState(initialFilters);
@@ -172,12 +171,6 @@ const Lab = ({ openRemarksModal }) => {
       filtersObj = appliedFilters
     ) => {
       setLoading(true);
-      setProgress(0);
-
-      // Increment progress until request completes
-      let interval = setInterval(() => {
-        setProgress((p) => (p < 90 ? p + 10 : p));
-      }, 300);
 
       try {
         const params = new URLSearchParams();
@@ -226,9 +219,7 @@ const Lab = ({ openRemarksModal }) => {
         setHardwareLogs([]);
         setTotalPages(1);
       } finally {
-        clearInterval(interval);
-        setProgress(100);
-        setTimeout(() => setLoading(false), 500);
+        setLoading(false);
       }
     },
     [
@@ -1092,7 +1083,7 @@ const Lab = ({ openRemarksModal }) => {
                       colSpan="19"
                       style={{ textAlign: "center", padding: "20px" }}
                     >
-                      <Loader progress={progress} />
+                      <Loader label="Loading hardware logs..." />
                     </td>
                   </tr>
                 ) : hardwareLogs.length > 0 ? (

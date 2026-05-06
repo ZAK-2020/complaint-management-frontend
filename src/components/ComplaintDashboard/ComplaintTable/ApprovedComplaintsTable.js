@@ -41,8 +41,6 @@ const ApprovedComplaintsTable = ({
   const [cityList, setCityList] = useState([]);
   const [statusList, setStatusList] = useState([]);
   const [engineers, setEngineers] = useState([]);
-  const [progress, setProgress] = useState(0);
-
   // NEW: backend-provided serial offset (complaints before this page)
   const [complaintsBeforePage, setComplaintsBeforePage] = useState(0);
 
@@ -87,11 +85,6 @@ const ApprovedComplaintsTable = ({
   // --- Fetch complaints (reads X-Complaints-Before-Page for continuous S.No) ---
   const fetchComplaints = async () => {
     setLoading(true);
-    setProgress(0);
-
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-    }, 300);
 
     try {
       const shared = pick(globalFilters, APPROVED_ALLOWED_KEYS);
@@ -118,16 +111,13 @@ const ApprovedComplaintsTable = ({
         res.headers?.["x-complaints-before-page"] ?? res.headers?.["X-Complaints-Before-Page"];
       setComplaintsBeforePage(Number.parseInt(beforePageHeader, 10) || 0);
 
-      setProgress(100);
     } catch (err) {
       setBranchGroups([]);
       setTotalPages(1);
       setTotalRecords(0);
       setComplaintsBeforePage(0); // reset offset on error
-      setProgress(100);
     } finally {
-      clearInterval(interval);
-      setTimeout(() => setLoading(false), 500);
+      setLoading(false);
     }
   };
 
@@ -261,8 +251,8 @@ const ApprovedComplaintsTable = ({
     setFilters(defaultFilters);
   };
 
-  const EXPORT_PAGE_SIZE = 1000; // bigger page size for export
-  const EXPORT_BATCH_SIZE = 3; // safe parallel batch size
+  const EXPORT_PAGE_SIZE = 250; // keep export chunks bounded for server memory
+  const EXPORT_BATCH_SIZE = 2; // smaller batches reduce parallel backend pressure
 
   const fetchAllComplaintsForExport = async () => {
     const shared = pick(globalFilters, APPROVED_ALLOWED_KEYS);
@@ -442,7 +432,7 @@ const ApprovedComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader progress={progress} />
+                <Loader label="Loading complaints..." />
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIdx) => (
                   <React.Fragment key={group.bankName + group.branchCode + groupIdx}>

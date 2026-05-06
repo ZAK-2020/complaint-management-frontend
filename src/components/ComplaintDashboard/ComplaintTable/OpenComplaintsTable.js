@@ -41,7 +41,6 @@ const OpenComplaintsTable = ({
   const [statusList, setStatusList] = useState([]);
   const [engineers, setEngineers] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [selectedComplaintId, setSelectedComplaintId] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [hoveredComplaintId, setHoveredComplaintId] = useState(null);
@@ -198,12 +197,6 @@ useComplaintReportsLive(async (wsData) => {
   // Fetch complaints (with filters)
   const fetchComplaints = async () => {
     setLoading(true);
-    setProgress(0); // reset loader percentage
-
-    // simulate progress increase until 90%
-    let interval = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-    }, 300);
 
     try {
       // Use shared filters (whitelisted) + local status
@@ -252,17 +245,13 @@ useComplaintReportsLive(async (wsData) => {
         res.headers?.["X-Complaints-Before-Page"];
       setComplaintsBeforePage(Number.parseInt(beforePageHeader, 10) || 0);
 
-      // complete progress
-      setProgress(100);
     } catch (err) {
       setGroups([]);
       setTotalPages(1);
       setTotalRecords(0);
       setComplaintsBeforePage(0); // reset offset on error
-      setProgress(100); // still show 100% if error
     } finally {
-      clearInterval(interval);
-      setTimeout(() => setLoading(false), 500); // short delay to let 100% show
+      setLoading(false);
     }
   };
 
@@ -343,8 +332,8 @@ useComplaintReportsLive(async (wsData) => {
   };
 
   // Export helpers
-  const EXPORT_PAGE_SIZE = 1000; // bigger chunk size for export
-  const EXPORT_BATCH_SIZE = 3; // safe parallel requests per batch
+  const EXPORT_PAGE_SIZE = 250; // keep export chunks bounded for server memory
+  const EXPORT_BATCH_SIZE = 2; // smaller batches reduce parallel backend pressure
 
   const fetchAllComplaintsForExport = async () => {
     const shared = pick(globalFilters, OPEN_ALLOWED_KEYS);
@@ -606,7 +595,7 @@ useComplaintReportsLive(async (wsData) => {
             </thead>
             <tbody>
               {loading ? (
-                <Loader progress={progress} />
+                <Loader label="Loading complaints..." />
               ) : groups.length > 0 ? (
                 groups.map((group, groupIdx) => (
                   <React.Fragment

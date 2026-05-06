@@ -41,7 +41,6 @@ const PendingForClosedComplaintsTable = ({
   // Bulk actions
   const [selectedComplaints, setSelectedComplaints] = useState([]);
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
-  const [progress, setProgress] = useState(0);
   // Reports
   const [selectedComplaintIdForReports, setSelectedComplaintIdForReports] =
     useState(null);
@@ -112,12 +111,6 @@ const PendingForClosedComplaintsTable = ({
   // --- API fetch, gets branchGroups directly from backend ---
   const fetchComplaints = async () => {
     setLoading(true);
-    setProgress(0); // reset loader percentage
-
-    // simulate progress increase until 90%
-    let interval = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-    }, 300);
 
     try {
       const shared = pick(globalFilters, PFC_ALLOWED_KEYS);
@@ -155,16 +148,13 @@ const PendingForClosedComplaintsTable = ({
         res.headers?.["X-Complaints-Before-Page"];
       setComplaintsBeforePage(Number.parseInt(beforePageHeader, 10) || 0);
 
-      setProgress(100); // complete progress
     } catch (err) {
       setBranchGroups([]);
       setTotalPages(1);
       setTotalRecords(0);
       setComplaintsBeforePage(0); // reset offset on error
-      setProgress(100); // finish bar even on error
     } finally {
-      clearInterval(interval);
-      setTimeout(() => setLoading(false), 500); // short delay so 100% shows
+      setLoading(false);
     }
   };
 
@@ -415,8 +405,8 @@ const PendingForClosedComplaintsTable = ({
   };
 
   // ---- REPORT GENERATION HANDLING -----
-  const EXPORT_PAGE_SIZE = 1000; // use bigger page size for export
-  const EXPORT_BATCH_SIZE = 3; // number of pages to fetch in parallel
+  const EXPORT_PAGE_SIZE = 250; // keep export chunks bounded for server memory
+  const EXPORT_BATCH_SIZE = 2; // smaller batches reduce parallel backend pressure
 
   const fetchAllComplaintsForExport = async () => {
     const shared = pick(globalFilters, PFC_ALLOWED_KEYS);
@@ -627,7 +617,7 @@ const PendingForClosedComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader progress={progress} />
+                <Loader label="Loading complaints..." />
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIndex) => (
                   <React.Fragment key={groupIndex}>

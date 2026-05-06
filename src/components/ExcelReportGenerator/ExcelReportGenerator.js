@@ -78,6 +78,34 @@ const fetchAllRemarksInBatch = async (complaintIds, API_BASE_URL) => {
   }
 };
 
+const fetchEngineerHistoryInBatch = async (complaintIds, API_BASE_URL) => {
+  try {
+    const ids = Array.from(
+      new Set((complaintIds || []).filter((id) => id && id.toString().trim()))
+    );
+
+    if (ids.length === 0) {
+      return {};
+    }
+
+    const response = await fetch(`${API_BASE_URL}/complaints/engineers/history/batch`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ids),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch engineer history in batch");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Engineer history batch fetch error:", error);
+    return {};
+  }
+};
+
 /**
  * Utility to remove extraneous tabs from text
  */
@@ -262,6 +290,13 @@ export const generateExcelReport = async (
     // 2) Fetch remarks & compute 'ageing' + 'lastActionDate'
     const complaintIds = filteredComplaints.map((c) => c.id);
 const remarksMap = await fetchAllRemarksInBatch(complaintIds, API_BASE_URL);
+const engineerHistoryMap =
+  selectedReport === "standard"
+    ? await fetchEngineerHistoryInBatch(
+        filteredComplaints.map((c) => c.complaintId),
+        API_BASE_URL
+      )
+    : {};
 
 let complaintsWithRemarks = filteredComplaints.map((c) => {
   const { allRemarksString = "Error fetching remarks", latestRemark = "Error fetching remarks" } =
@@ -302,6 +337,7 @@ let complaintsWithRemarks = filteredComplaints.map((c) => {
     ...c,
     allRemarksString,
     latestRemark,
+    engineerHistory: engineerHistoryMap[c.complaintId] || c.visitorName || "",
     ageing,
     lastActionDate,
   };
@@ -494,7 +530,7 @@ let complaintsWithRemarks = filteredComplaints.map((c) => {
             sanitizeText(complaint.details),
             complaint.equipmentDescription|| "",
             sanitizeText(complaint.allRemarksString),
-            complaint.visitorName || "",
+            complaint.engineerHistory || complaint.visitorName || "",
             complaint.repeatComplaint ? "Yes" : "No",
             complaint.complaintStatus || "",
             complaint.courierStatus || ""

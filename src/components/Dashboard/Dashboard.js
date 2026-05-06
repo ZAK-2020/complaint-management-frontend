@@ -1,8 +1,6 @@
 // Dashboard.js
 import React, { Suspense, useEffect, useState } from "react";
 import ComplaintForm from "../ComplaintForm/ComplaintForm";
-import ComplaintDashboard from "../ComplaintDashboard/ComplaintDashboard";
-import Maps from "../Map/Maps";
 // import Scheduler from "../Scheduler/Scheduler";
 import TodaysMetrics from "../Metrics/TodaysMetrics";
 import OverallMetrics from "../Metrics/OverallMetrics";
@@ -81,7 +79,6 @@ function Dashboard() {
   const [username, setUsername] = useState("");
 
   const [showComplaintForm, setShowComplaintForm] = useState(false);
-  const [showComplaintLog, setShowComplaintLog] = useState(false);
   const [viewStatus, setViewStatus] = useState("");
   const [complaints, setComplaints] = useState([]);
   const [statuses, setStatuses] = useState([]);
@@ -120,7 +117,6 @@ function Dashboard() {
   const [isRemarksModalOpen, setIsRemarksModalOpen] = useState(false);
 
   // Others
-  const [showMap, setShowMap] = useState(false);
   const [showLab, setShowLab] = useState(false);
   const [showLabAssigned, setShowLabAssigned] = useState(false);
 
@@ -573,15 +569,11 @@ function Dashboard() {
     setViewStatus(status);
     setIsDailyView(isDaily);
     setShowComplaintForm(false);
-    setShowComplaintLog(false);
-    setShowMap(false);
   };
 
   const handleNavigation = (view) => {
     setShowComplaintForm(false);
-    setShowComplaintLog(false);
     setShowScheduler(false);
-    setShowMap(false);
     setViewStatus("");
     setIsDailyView(false);
     setShowIncomingHardware(false);
@@ -596,13 +588,6 @@ function Dashboard() {
         break;
       case "new-complaint":
         setShowComplaintForm(true);
-        break;
-     
-      case "complaint-history":
-        setShowComplaintLog(true);
-        break;
-      case "map":
-        setShowMap(true);
         break;
       case "scheduler":
         setShowScheduler(true);
@@ -642,8 +627,6 @@ function Dashboard() {
 
     if (showComplaintForm)
       return <ComplaintForm onSubmit={handleComplaintSubmit} />;
-    if (showComplaintLog) return <ComplaintDashboard complaints={complaints} />;
-    if (showMap) return <Maps />;
     if (showScheduler)
       return (
         <Suspense fallback={<div>Loading Scheduler...</div>}>
