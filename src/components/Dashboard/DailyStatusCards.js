@@ -40,7 +40,12 @@ const DailyStatusCards = ({
   dashboardCountsLoading,
   dashboardCountsError,
 }) => {
-  const currentDate = new Date().toISOString().split("T")[0];
+  const currentDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Karachi",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 
   // Fallback: old logic
   const todayClosedCount = complaints.filter(
