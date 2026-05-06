@@ -1,22 +1,22 @@
 import React, { useState } from "react";
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
-import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
-import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
-import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import DesktopWindowsRoundedIcon from "@mui/icons-material/DesktopWindowsRounded";
 import SouthWestRoundedIcon from "@mui/icons-material/SouthWestRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
-import ScienceRoundedIcon from "@mui/icons-material/ScienceRounded";
+import BiotechRoundedIcon from "@mui/icons-material/BiotechRounded";
 import EngineeringRoundedIcon from "@mui/icons-material/EngineeringRounded";
-import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
+import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import TodayRoundedIcon from "@mui/icons-material/TodayRounded";
 import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import Logo from "../../assets/logo.gif";
 
-const NavButton = ({ icon, label, onClick, className = "nav-item" }) => (
+const NavButton = ({ icon, label, onClick, className = "nav-item", tone = "default" }) => (
   <button className={className} onClick={onClick} type="button">
-    <span className="icon" aria-hidden="true">
+    <span className={`icon icon-${tone}`} aria-hidden="true">
       {icon}
     </span>
     <span>{label}</span>
@@ -44,22 +44,25 @@ const Sidebar = ({ handleNavigation }) => {
   const renderLabMenu = () => (
     <>
       <NavButton
-        icon={<ScienceRoundedIcon fontSize="small" />}
+        icon={<BiotechRoundedIcon fontSize="small" />}
         label="Lab"
+        tone="lab"
         onClick={() => setIsLabDropdownOpen((prev) => !prev)}
       />
       {isLabDropdownOpen && (
         <div className="submenu">
           <NavButton
             className="nav-item submenu-item"
-            icon={<ScienceRoundedIcon fontSize="small" />}
+            icon={<BiotechRoundedIcon fontSize="small" />}
             label="Lab Dashboard"
+            tone="lab"
             onClick={() => handleNavigation("lab")}
           />
           <NavButton
             className="nav-item submenu-item"
             icon={<EngineeringRoundedIcon fontSize="small" />}
             label="Lab Assigned"
+            tone="lab"
             onClick={() => handleNavigation("lab-assigned")}
           />
         </div>
@@ -77,6 +80,7 @@ const Sidebar = ({ handleNavigation }) => {
         <NavButton
           icon={<BusinessRoundedIcon fontSize="small" />}
           label="ISB/RWP Complaints"
+          tone="dashboard"
           onClick={() => handleNavigation("isb-rwp-complaints")}
         />
       );
@@ -85,23 +89,27 @@ const Sidebar = ({ handleNavigation }) => {
     return (
       <>
         <NavButton
-          icon={<DashboardRoundedIcon fontSize="small" />}
+          icon={<HomeRoundedIcon fontSize="small" />}
           label="Dashboard"
+          tone="dashboard"
           onClick={() => handleNavigation("dashboard")}
         />
         <NavButton
-          icon={<AddCircleOutlineRoundedIcon fontSize="small" />}
+          icon={<AddRoundedIcon fontSize="small" />}
           label="Register New Complaint"
+          tone="register"
           onClick={() => handleNavigation("new-complaint")}
         />
         <NavButton
-          icon={<EventNoteRoundedIcon fontSize="small" />}
+          icon={<CalendarMonthRoundedIcon fontSize="small" />}
           label="Scheduler"
+          tone="scheduler"
           onClick={() => handleNavigation("scheduler")}
         />
         <NavButton
-          icon={<LocalShippingRoundedIcon fontSize="small" />}
+          icon={<DesktopWindowsRoundedIcon fontSize="small" />}
           label="Courier Tracking"
+          tone="courier"
           onClick={() => setIsCourierTrackingOpen((prev) => !prev)}
         />
         {isCourierTrackingOpen && (
@@ -110,20 +118,23 @@ const Sidebar = ({ handleNavigation }) => {
               className="nav-item submenu-item"
               icon={<SouthWestRoundedIcon fontSize="small" />}
               label="Incoming Hardware"
+              tone="courier"
               onClick={() => handleNavigation("incoming-hardware")}
             />
             <NavButton
               className="nav-item submenu-item"
               icon={<NorthEastRoundedIcon fontSize="small" />}
               label="Outgoing Hardware"
+              tone="courier"
               onClick={() => handleNavigation("outgoing-hardware")}
             />
           </div>
         )}
         {renderLabMenu()}
         <NavButton
-          icon={<QueryStatsRoundedIcon fontSize="small" />}
+          icon={<BarChartRoundedIcon fontSize="small" />}
           label="Metrics"
+          tone="metrics"
           onClick={() => setIsMetricsDropdownOpen((prev) => !prev)}
         />
         {isMetricsDropdownOpen && (
@@ -132,12 +143,14 @@ const Sidebar = ({ handleNavigation }) => {
               className="nav-item submenu-item"
               icon={<TodayRoundedIcon fontSize="small" />}
               label="Today's Metrics"
+              tone="metrics"
               onClick={() => handleNavigation("todays-metrics")}
             />
             <NavButton
               className="nav-item submenu-item"
               icon={<AssessmentRoundedIcon fontSize="small" />}
               label="Overall Metrics"
+              tone="metrics"
               onClick={() => handleNavigation("overall-metrics")}
             />
           </div>
@@ -158,6 +171,7 @@ const Sidebar = ({ handleNavigation }) => {
           className="nav-item logout-button"
           icon={<LogoutRoundedIcon fontSize="small" />}
           label="Logout"
+          tone="logout"
           onClick={handleLogout}
         />
       </nav>

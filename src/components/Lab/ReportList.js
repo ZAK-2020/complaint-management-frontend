@@ -455,7 +455,7 @@ const ReportList = ({
               onClick={handleAddPart}
               disabled={addingPart || !newPartName.trim()}
             >
-              {addingPart ? "Adding…" : "Add Part"}
+              {addingPart ? "Adding..." : "Add Part"}
             </button>
           </div>
         </div>
@@ -667,8 +667,8 @@ const ReportList = ({
             className="report-textarea"
             placeholder={
               canChoosePart
-                ? "Write your report for the selected hardware part…"
-                : "Write your report here…"
+                ? "Write your report for the selected hardware part..."
+                : "Write your report here..."
             }
           />
           <button
@@ -678,7 +678,7 @@ const ReportList = ({
               submitting || !newReport.trim() || (canChoosePart && !selectedPartId)
             }
           >
-            {submitting ? "Submitting…" : "Submit Report"}
+            {submitting ? "Submitting..." : "Submit Report"}
           </button>
         </div>
       )}

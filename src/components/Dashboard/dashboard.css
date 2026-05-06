@@ -56,7 +56,9 @@
   flex-direction: column;
   align-items: center; /* Centers the navigation items horizontally */
   justify-content: center; /* Centers the navigation items vertically */
-  gap: 15px; /* Adds consistent spacing between the items */
+  gap: 12px; /* Adds consistent spacing between the items */
+  padding: 0 10px 14px;
+  box-sizing: border-box;
 }
 
 
@@ -65,24 +67,28 @@
   align-items: center;
   margin: 5px 0;
   width: 100%; /* Ensure items span the full width */
-  padding: 15px 20px; /* Adjust padding for spacing */
+  min-height: 52px;
+  padding: 13px 16px; /* Adjust padding for spacing */
   text-decoration: none;
   color: #555;
-  font-weight: 500;
-  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  background: #f1f1f1;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  border-radius: 10px;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  border-radius: 8px;
   text-align: left;
 }
 
 
 .sidebar-nav .nav-item:hover,
 .sidebar-nav .nav-item:focus {
-  background-color: #f1f1f1; /* Lighter hover background for better contrast */
+  background-color: #e9f2ff; /* Lighter hover background for better contrast */
   color: #007bff;
   border-left-color: #007bff; /* Consistent hover border color */
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.08);
 }
 
 .sidebar-nav .active {
@@ -92,12 +98,45 @@
 }
 
 .sidebar-nav .nav-item .icon {
-  margin-right: 10px;
-  font-size: 18px;
-  min-width: 20px;
+  margin-right: 12px;
+  font-size: 22px;
+  min-width: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.sidebar-nav .nav-item .icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.sidebar-nav .icon-dashboard {
+  color: #f97316;
+}
+
+.sidebar-nav .icon-register {
+  color: #6d5bd0;
+}
+
+.sidebar-nav .icon-scheduler {
+  color: #1d9bf0;
+}
+
+.sidebar-nav .icon-courier {
+  color: #18a3c7;
+}
+
+.sidebar-nav .icon-lab {
+  color: #7591c7;
+}
+
+.sidebar-nav .icon-metrics {
+  color: #20c997;
+}
+
+.sidebar-nav .icon-logout {
+  color: #f59e0b;
 }
 
 /* Main Content Styles */
