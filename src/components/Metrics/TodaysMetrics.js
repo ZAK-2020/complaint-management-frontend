@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import TodaysComplaints from "./TodaysComplaints/TodaysComplaints";
 import TodayBankWiseComplaints from "./TodayBankWiseComplaints/TodayBankWiseComplaints";
@@ -14,24 +14,7 @@ const TodaysMetrics = () => {
   const [cityWiseTodaysComplaints, setCityWiseTodaysComplaints] = useState({});
   const [bankWiseTodaysComplaints, setBankWiseTodaysComplaints] = useState({});
 
-  // Fetch all metrics on component mount
-  useEffect(() => {
-    fetchAllMetrics();
-  }, []);
-
-  const fetchAllMetrics = async () => {
-    try {
-      await Promise.all([
-        fetchTodaysComplaints(),
-        fetchCityWiseTodaysComplaints(),
-        fetchBankWiseTodaysComplaints(),
-      ]);
-    } catch (error) {
-      console.error("Error fetching metrics data:", error);
-    }
-  };
-
-  const fetchTodaysComplaints = async () => {
+  const fetchTodaysComplaints = useCallback(async () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/complaints/todays-complaints`,
@@ -41,9 +24,9 @@ const TodaysMetrics = () => {
     } catch (error) {
       console.error("Error fetching today's complaints metrics:", error);
     }
-  };
+  }, []);
 
-  const fetchCityWiseTodaysComplaints = async () => {
+  const fetchCityWiseTodaysComplaints = useCallback(async () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/complaints/city-wise-todays-metrics`,
@@ -61,9 +44,9 @@ const TodaysMetrics = () => {
     } catch (error) {
       console.error("Error fetching city-wise today's complaints metrics:", error);
     }
-  };
+  }, []);
 
-  const fetchBankWiseTodaysComplaints = async () => {
+  const fetchBankWiseTodaysComplaints = useCallback(async () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/complaints/bank-wise-todays-metrics`,
@@ -81,7 +64,28 @@ const TodaysMetrics = () => {
     } catch (error) {
       console.error("Error fetching bank-wise today's complaints metrics:", error);
     }
-  };
+  }, []);
+
+  const fetchAllMetrics = useCallback(async () => {
+    try {
+      await Promise.all([
+        fetchTodaysComplaints(),
+        fetchCityWiseTodaysComplaints(),
+        fetchBankWiseTodaysComplaints(),
+      ]);
+    } catch (error) {
+      console.error("Error fetching metrics data:", error);
+    }
+  }, [
+    fetchTodaysComplaints,
+    fetchCityWiseTodaysComplaints,
+    fetchBankWiseTodaysComplaints,
+  ]);
+
+  // Fetch all metrics on component mount
+  useEffect(() => {
+    fetchAllMetrics();
+  }, [fetchAllMetrics]);
 
   return (
     <div className="metrics-container">

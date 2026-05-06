@@ -30,36 +30,6 @@ const cityOrder = [
   "Faisalabad", "Sargodha", "Sialkot", "Jhelum", "Abbottabad",
 ];
 
-function getOrderedCityGroups(events, cityOrder) {
-  const cityOrderLower = cityOrder.map((c) => c.toLowerCase());
-  const groups = {};
-  events.forEach((event) => {
-    const cityName = event.city || "";
-    const normalized = cityName.toLowerCase();
-    const foundIndex = cityOrderLower.indexOf(normalized);
-
-    let groupKey;
-    if (foundIndex !== -1) {
-      groupKey = cityOrder[foundIndex];
-    } else {
-      groupKey = `Others (${cityName.charAt(0).toUpperCase() + cityName.slice(1)})`;
-    }
-    if (!groups[groupKey]) groups[groupKey] = [];
-    groups[groupKey].push(event);
-  });
-  const ordered = [];
-  cityOrder.forEach((city) => {
-    if (groups[city]) {
-      ordered.push({ city, events: groups[city] });
-      delete groups[city];
-    }
-  });
-  Object.entries(groups).forEach(([city, events]) => {
-    ordered.push({ city, events });
-  });
-  return ordered;
-}
-
 const Scheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [resources, setResources] = useState([]);

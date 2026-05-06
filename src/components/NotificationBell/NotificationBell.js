@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./NotificationBell.css";
 
 const NotificationBell = () => {
@@ -10,7 +10,7 @@ const NotificationBell = () => {
 
   const toggleDropdown = () => setOpen(!open);
 
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -26,11 +26,11 @@ const NotificationBell = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     if (open) fetchActivities();
-  }, [open]);
+  }, [fetchActivities, open]);
 
   return (
     <div style={{ position: "relative" }}>

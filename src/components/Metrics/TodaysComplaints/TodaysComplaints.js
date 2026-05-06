@@ -79,7 +79,7 @@ const TodaysComplaints = ({ todayOpenComplaints, todayClosedComplaints }) => {
       .style("opacity", 0);
 
     // Bind data and create arcs
-    const arcs = svg
+    svg
       .selectAll("path")
       .data(pie(data))
       .enter()
