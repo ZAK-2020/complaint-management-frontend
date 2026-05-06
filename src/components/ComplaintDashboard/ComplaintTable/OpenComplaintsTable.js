@@ -595,7 +595,11 @@ useComplaintReportsLive(async (wsData) => {
             </thead>
             <tbody>
               {loading ? (
-                <Loader label="Loading complaints..." />
+                <tr className="table-loader-row">
+                  <td colSpan="22">
+                    <Loader label="Loading complaints..." />
+                  </td>
+                </tr>
               ) : groups.length > 0 ? (
                 groups.map((group, groupIdx) => (
                   <React.Fragment

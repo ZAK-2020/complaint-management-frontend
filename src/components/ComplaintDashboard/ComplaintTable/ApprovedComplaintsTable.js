@@ -432,7 +432,11 @@ const ApprovedComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader label="Loading complaints..." />
+                <tr className="table-loader-row">
+                  <td colSpan="22">
+                    <Loader label="Loading complaints..." />
+                  </td>
+                </tr>
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIdx) => (
                   <React.Fragment key={group.bankName + group.branchCode + groupIdx}>

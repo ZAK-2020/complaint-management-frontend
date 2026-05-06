@@ -617,7 +617,11 @@ const PendingForClosedComplaintsTable = ({
             </thead>
             <tbody>
               {loading ? (
-                <Loader label="Loading complaints..." />
+                <tr className="table-loader-row">
+                  <td colSpan="25">
+                    <Loader label="Loading complaints..." />
+                  </td>
+                </tr>
               ) : branchGroups.length > 0 ? (
                 branchGroups.map((group, groupIndex) => (
                   <React.Fragment key={groupIndex}>

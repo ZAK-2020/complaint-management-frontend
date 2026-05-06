@@ -16,9 +16,9 @@
 
 .loader--section {
   width: 100%;
-  min-height: 120px;
+  min-height: 150px;
   flex-direction: column;
-  padding: 20px 0;
+  padding: 28px 0;
 }
 
 .loader--inline {
@@ -32,8 +32,9 @@
   border-radius: 50%;
   border-style: solid;
   border-color: #dbe3ea;
-  border-top-color: #3498db;
-  animation: spin 0.9s linear infinite;
+  border-top-color: #0073e6;
+  box-shadow: 0 0 0 4px rgba(0, 115, 230, 0.06);
+  animation: spin 0.85s linear infinite;
   flex-shrink: 0;
 }
 
@@ -57,7 +58,8 @@
 
 .loader-text {
   font-weight: 600;
-  color: #374151;
+  color: #1f2937;
+  letter-spacing: 0;
 }
 
 .loader-text--section,
@@ -74,4 +76,16 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.table-loader-row td {
+  padding: 0 !important;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  white-space: normal !important;
+}
+
+.table-loader-row .loader {
+  min-width: 100%;
+  min-height: 180px;
 }
