@@ -51,6 +51,7 @@ const ReportList = ({
   bankName,
   branchCode,
   branchName,
+  showTitle = true,
 
   // NEW: determines whether qamar is allowed to add parts (Karachi only)
   complaintCity,
@@ -404,7 +405,7 @@ const ReportList = ({
 
   return (
     <div className="report-container">
-      <h3 className="report-title">Hardware Reports</h3>
+      {showTitle && <h3 className="report-title">Hardware Reports</h3>}
 
       {/* ----- Context line for quick reference ----- */}
       {(canManageParts || canAddParts) && (
@@ -520,7 +521,7 @@ const ReportList = ({
                         title={part.assignedEngineer ? "Reassign engineer" : "Assign engineer"}
                       >
                         <option value="">
-                          {part.assignedEngineer ? "— Unassign —" : "Assign Engineer"}
+                          {part.assignedEngineer ? "-- Unassign --" : "Assign Engineer"}
                         </option>
                         {labEngineers.map((eng) =>
                           typeof eng === "string" ? (
@@ -639,7 +640,7 @@ const ReportList = ({
                 {partsForSelection.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.hardwareName || `Part #${p.id}`}
-                    {p.assignedEngineer ? ` — ${p.assignedEngineer}` : ""}
+                    {p.assignedEngineer ? ` -- ${p.assignedEngineer}` : ""}
                   </option>
                 ))}
               </select>
@@ -650,7 +651,7 @@ const ReportList = ({
                   <span className="pill-text">
                     {selectedPart?.hardwareName || `Part #${selectedPartId}`}
                     {selectedPart?.assignedEngineer
-                      ? ` — ${selectedPart.assignedEngineer}`
+                      ? ` -- ${selectedPart.assignedEngineer}`
                       : ""}
                   </span>
                 </div>

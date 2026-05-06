@@ -30,32 +30,45 @@ const ReportModal = ({
 
   return (
     <div className="report-modal-overlay">
-      <div className="report-modal">
-        <button className="report-modal-close" onClick={handleClose}>
-          &times;
-        </button>
+      <div className="report-modal" role="dialog" aria-modal="true">
+        <div className="report-modal-header">
+          <div>
+            <h2 className="report-modal-title">Hardware Reports</h2>
+            {complaintId ? (
+              <div className="report-modal-subtitle">Complaint ID: {complaintId}</div>
+            ) : null}
+          </div>
+          <button
+            className="report-modal-close"
+            onClick={handleClose}
+            aria-label="Close hardware reports"
+          >
+            &times;
+          </button>
+        </div>
 
-        <h2>Hardware Reports</h2>
-
-        {/* ReportList now embeds full parts management + part-linked reports */}
-        <ReportList
-          complaintId={complaintId}
-          allowAdd={allowAdd}
-          onReportAdded={() => {
-            if (onReportAdded) onReportAdded(complaintId);
-          }}
-          /* provide parts + api so ReportList can manage parts inline */
-          partsLogId={partsLogId}
-          hardwareParts={hardwareParts}
-          refreshParts={refreshParts}
-          apiBaseUrl={API_BASE_URL}
-          mode="lab" // keep same behavior as your modal by default
-          bankName={bankName}
-          branchCode={branchCode}
-          branchName={branchName}
-          /* NEW: gates "Add Part" to Qamar when city is Karachi */
-          complaintCity={complaintCity}
-        />
+        <div className="report-modal-body">
+          {/* ReportList now embeds full parts management + part-linked reports */}
+          <ReportList
+            complaintId={complaintId}
+            allowAdd={allowAdd}
+            onReportAdded={() => {
+              if (onReportAdded) onReportAdded(complaintId);
+            }}
+            /* provide parts + api so ReportList can manage parts inline */
+            partsLogId={partsLogId}
+            hardwareParts={hardwareParts}
+            refreshParts={refreshParts}
+            apiBaseUrl={API_BASE_URL}
+            mode="lab" // keep same behavior as your modal by default
+            bankName={bankName}
+            branchCode={branchCode}
+            branchName={branchName}
+            /* NEW: gates "Add Part" to Qamar when city is Karachi */
+            complaintCity={complaintCity}
+            showTitle={false}
+          />
+        </div>
       </div>
     </div>
   );
